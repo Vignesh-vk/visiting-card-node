@@ -4,10 +4,12 @@ const Tesseract = require('tesseract.js');
 const Upload = async (req, res) => {
     try {
       const { data: { text } } = await Tesseract.recognize(
-        req.file.buffer, // Your image buffer
-        'eng', // Language
+        req.file.buffer,
+        'eng',
         {
-            logger: info => console.log(info)
+            logger: info => console.log(info),
+            corePath: 'node_modules/tesseract.js-core/tesseract-core-simd.wasm',
+                workerPath: 'node_modules/tesseract.js-core/worker.min.js'
         }
     );
 
