@@ -1,30 +1,23 @@
 const CardDetails = require('../model/cardDetails');
-const { createWorker } = require('tesseract.js');
-
-const worker = createWorker({
-  logger: info => console.log(info)
-});
+const Tesseract = require('tesseract.js');
 
 const Upload = async (req, res) => {
     try {
-      await worker.load();
-      await worker.loadLanguage('eng');
-      await worker.initialize('eng');
+      const { data: { text } } = await Tesseract.recognize(
+        req.file.buffer, // Your image buffer
+        'eng', // Language
+        {
+            logger: info => console.log(info)
+        }
+    );
 
-      // Recognize the text
-      const { data: { text } } = await worker.recognize(req.file.buffer);
+    const cardInfo = parseCardInfo(text);
+    cardInfo.imageUrl = req.file.originalname;
 
-      // Process the extracted text
-      const cardInfo = parseCardInfo(text);
-      cardInfo.imageUrl = req.file.originalname;
+    const card = new CardDetails(cardInfo);
+    await card.save();
 
-      const card = new CardDetails(cardInfo);
-      await card.save();
-
-      // Terminate the worker
-      await worker.terminate();
-
-      res.status(200).json(card);
+    res.status(200).json(card);
       } catch (error) {
         res.status(500).json({ message: error.message });
       }
