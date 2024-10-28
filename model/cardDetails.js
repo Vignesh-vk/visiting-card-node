@@ -1,4 +1,3 @@
-// model/contact.js
 const mongoose = require('mongoose');
 
 const cardDetailsSchema = new mongoose.Schema({

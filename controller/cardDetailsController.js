@@ -10,7 +10,6 @@ const Upload = async (req, res) => {
         const extractedText = result.data.text;
         const cardInfo = parseCardInfo(extractedText);
     
-        // Save the original image filename or URL
         cardInfo.imageUrl = req.file.originalname;
     
         const card = new CardDetails(cardInfo);
@@ -30,8 +29,6 @@ const Cards = async (req,res) =>{
       .skip((page - 1) * limit)
       .limit(Number(limit))
       .sort({ createdAt: -1 });
-
-      console.log("cards.....",cards)
 
     const total = await CardDetails.countDocuments();
     
