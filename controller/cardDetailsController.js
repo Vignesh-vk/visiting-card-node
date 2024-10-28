@@ -12,8 +12,8 @@ const Upload = async (req, res) => {
         // Create Tesseract worker
         const worker = tesseract.createWorker({
             logger: info => console.log(info), // Optional logger
-            workerPath: './public/wasm/tesseract-core-simd.wasm', // Update path as necessary
-            corePath: './public/wasm/tesseract-core.wasm' // Update path as necessary
+            workerPath: '../public/wasm/tesseract-core-simd.wasm', // Update path as necessary
+            corePath: '../public/wasm/tesseract-core.wasm' // Update path as necessary
         });
 
         // Load the worker and recognize text
