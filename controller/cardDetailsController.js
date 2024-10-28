@@ -7,6 +7,8 @@ const Upload = async (req, res) => {
       logger: info => console.log(info)
     });
 
+    console.log("text......",result)
+
     const extractedText = result.data.text;
     const cardInfo = parseCardInfo(extractedText);
     cardInfo.imageUrl = req.file.originalname;
