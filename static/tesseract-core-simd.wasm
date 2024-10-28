@@ -1,6 +1,0 @@
-const { createWorker } = require('tesseract.js');
-
-const worker = createWorker({
-    logger: info => console.log(info),
-    wasmPath: '/static/tesseract-core-simd.wasm'
-});
