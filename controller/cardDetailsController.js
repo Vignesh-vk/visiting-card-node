@@ -3,21 +3,39 @@ const tesseract = require('tesseract.js');
 
 const Upload = async (req, res) => {
   try {
-    console.log("test.......")
-    const result = await tesseract.recognize(req.file.buffer, 'eng', {
-      logger: info => console.log(info),
-      workerPath: '../public/wasm/tesseract-core-simd.wasm', 
-      corePath: '../public/wasm/tesseract-core.wasm' 
-    });
+    console.log("Request File:", req.file);
 
-    const extractedText = result.data.text;
-    const cardInfo = parseCardInfo(extractedText);
-    cardInfo.imageUrl = req.file.originalname;
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
 
-    const card = new CardDetails(cardInfo);
-    await card.save();
+        // Create Tesseract worker
+        const worker = tesseract.createWorker({
+            logger: info => console.log(info), // Optional logger
+            workerPath: './public/wasm/tesseract-core-simd.wasm', // Update path as necessary
+            corePath: './public/wasm/tesseract-core.wasm' // Update path as necessary
+        });
 
-    res.status(200).json(card);
+        // Load the worker and recognize text
+        await worker.load();
+        await worker.loadLanguage('eng');
+        await worker.initialize('eng');
+
+        // Recognize text from the image buffer
+        const { data: { text: extractedText } } = await worker.recognize(req.file.buffer);
+        
+        // Terminate the worker after use
+        await worker.terminate();
+
+        console.log("OCR Result:", extractedText);
+
+        const cardInfo = parseCardInfo(extractedText); // Assuming you have this function
+        cardInfo.imageUrl = req.file.originalname;
+
+        const card = new CardDetails(cardInfo);
+        await card.save();
+
+        res.status(200).json(card);
   } catch (error) {
     console.error('Error during file upload:', error);
     res.status(500).json({ message: 'File upload failed', error: error.message });
