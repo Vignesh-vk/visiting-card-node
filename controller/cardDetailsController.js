@@ -3,20 +3,26 @@ const tesseract = require('tesseract.js');
 
 const Upload = async (req, res) => {
   try {
-    console.log("Request File:", req.file);
+     console.log("Request File:", req.file);
 
         if (!req.file) {
             return res.status(400).json({ message: 'No file uploaded' });
         }
 
-        const result = await tesseract.recognize(req.file.buffer, 'eng', {
-            logger: info => console.log(info)
-        });
+        const worker = tesseract.createWorker({
+          logger: info => console.log(info),
+          workerPath: '../public/wasm/tesseract-core-simd.wasm', // Update path as necessary
+          corePath: '../public/wasm/tesseract-core-simd.wasm'    // Update path as necessary
+      });
 
-        console.log("OCR Result:", result);
+        await worker.load();
+        await worker.loadLanguage('eng');
+        await worker.initialize('eng');
+        const { data: { text: extractedText } } = await worker.recognize(req.file.buffer);
+        await worker.terminate();
 
+        console.log("OCR Result:", extractedText);
 
-    const extractedText = result.data.text;
     const cardInfo = parseCardInfo(extractedText);
     cardInfo.imageUrl = req.file.originalname;
 
