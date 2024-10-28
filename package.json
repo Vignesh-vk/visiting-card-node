@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "build": "cp node_modules/tesseract.js-core/tesseract-core-simd.wasm static/"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
