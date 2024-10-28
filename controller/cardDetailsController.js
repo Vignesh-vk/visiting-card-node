@@ -1,5 +1,5 @@
 const CardDetails = require('../model/cardDetails');
-const tesseract = require('tesseract.js');
+const { createWorker } = require('tesseract.js');
 
 const worker = createWorker({
   logger: info => console.log(info)
