@@ -1,21 +1,13 @@
 const CardDetails = require('../model/cardDetails');
 const Tesseract = require('tesseract.js');
-const path = require('path');
 
 const Upload = async (req, res) => {
     try {
-      const workerPath = path.join(__dirname, 'node_modules', 'tesseract.js-core', 'worker.min.js');
-        const corePath = path.join(__dirname, 'node_modules', 'tesseract.js-core', 'tesseract-core-simd.wasm');
-      const { data: { text } } = await Tesseract.recognize(
-        req.file.buffer,
-        'eng',
-        {
-            logger: info => console.log(info),
-            corePath,
-                workerPath
-        }
-    );
-
+      const { path } = req.file;
+      const { data: { text } } = await Tesseract.recognize(path, 'eng', {
+        logger: info => console.log(info),
+      });
+  
     const cardInfo = parseCardInfo(text);
     cardInfo.imageUrl = req.file.originalname;
 
