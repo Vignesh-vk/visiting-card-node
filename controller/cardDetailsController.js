@@ -3,6 +3,7 @@ const tesseract = require('tesseract.js');
 
 const Upload = async (req, res) => {
   try {
+    console.log("test.......",req.file)
     const result = await tesseract.recognize(req.file.buffer, 'eng', {
       logger: info => console.log(info)
     });
