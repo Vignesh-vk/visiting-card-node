@@ -3,13 +3,17 @@ const tesseract = require('tesseract.js');
 
 const Upload = async (req, res) => {
   try {
-    console.log("test.......",req.file)
-    const result = await tesseract.recognize(req.file.buffer, 'eng', {
-      logger: info => console.log(info),
-      wasmPath: '/static/tesseract-core-simd.wasm'
-  });
+    console.log("Request File:", req.file);
 
-  console.log("OCR Result:", result);
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        const result = await tesseract.recognize(req.file.buffer, 'eng', {
+            logger: info => console.log(info)
+        });
+
+        console.log("OCR Result:", result);
 
 
     const extractedText = result.data.text;
