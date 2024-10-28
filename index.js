@@ -19,7 +19,7 @@ app.use(cors({
 
 app.use(bodyParser.json());
 
-app.use('/static', express.static(path.join(__dirname, 'static')));
+// app.use('/static', express.static(path.join(__dirname, 'static')));
 
 app.get('/', (req, res) => {
     res.send('Welcome to Visiting card scanner!');
