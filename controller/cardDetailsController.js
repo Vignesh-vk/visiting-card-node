@@ -11,13 +11,14 @@ const Upload = async (req, res) => {
 
         const worker = tesseract.createWorker({
           logger: info => console.log(info),
-          workerPath: '../public/wasm/tesseract-core-simd.wasm', // Update path as necessary
-          corePath: '../public/wasm/tesseract-core-simd.wasm'    // Update path as necessary
+          workerPath: './public/wasm/tesseract-core-simd.wasm', 
+          corePath: './public/wasm/tesseract-core.wasm'  
       });
 
-        await worker.load();
-        await worker.loadLanguage('eng');
-        await worker.initialize('eng');
+      // Load the worker
+      await worker.load();
+      await worker.loadLanguage('eng');
+      await worker.initialize('eng');
         const { data: { text: extractedText } } = await worker.recognize(req.file.buffer);
         await worker.terminate();
 
