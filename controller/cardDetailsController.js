@@ -5,10 +5,12 @@ const Upload = async (req, res) => {
   try {
     console.log("test.......",req.file)
     const result = await tesseract.recognize(req.file.buffer, 'eng', {
-      logger: info => console.log(info)
-    });
+      logger: info => console.log(info),
+      wasmPath: '/static/tesseract-core-simd.wasm'
+  });
 
-    console.log("text......",result)
+  console.log("OCR Result:", result);
+
 
     const extractedText = result.data.text;
     const cardInfo = parseCardInfo(extractedText);
