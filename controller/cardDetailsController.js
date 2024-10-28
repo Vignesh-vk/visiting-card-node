@@ -1,57 +1,48 @@
 const CardDetails = require('../model/cardDetails');
 const tesseract = require('tesseract.js');
 
+const worker = createWorker({
+  logger: info => console.log(info)
+});
+
 const Upload = async (req, res) => {
-  try {
-    console.log("Request File:", req.file);
-
-        if (!req.file) {
-            return res.status(400).json({ message: 'No file uploaded' });
-        }
-
-        // Create Tesseract worker
-        const worker = tesseract.createWorker({
-          logger: info => console.log(info) // Optional logger
-      });
-
-      // Load the worker and initialize language
+    try {
       await worker.load();
       await worker.loadLanguage('eng');
       await worker.initialize('eng');
 
-        // Recognize text from the image buffer
-        const { data: { text: extractedText } } = await worker.recognize(req.file.buffer);
-        
-        // Terminate the worker after use
-        await worker.terminate();
+      // Recognize the text
+      const { data: { text } } = await worker.recognize(req.file.buffer);
 
-        console.log("OCR Result:", extractedText);
+      // Process the extracted text
+      const cardInfo = parseCardInfo(text);
+      cardInfo.imageUrl = req.file.originalname;
 
-        const cardInfo = parseCardInfo(extractedText); // Assuming you have this function
-        cardInfo.imageUrl = req.file.originalname;
+      const card = new CardDetails(cardInfo);
+      await card.save();
 
-        const card = new CardDetails(cardInfo);
-        await card.save();
+      // Terminate the worker
+      await worker.terminate();
 
-        res.status(200).json(card);
-  } catch (error) {
-    console.error('Error during file upload:', error);
-    res.status(500).json({ message: 'File upload failed', error: error.message });
-  }
+      res.status(200).json(card);
+      } catch (error) {
+        res.status(500).json({ message: error.message });
+      }
 }
 
-
-const Cards = async (req, res) => {
-  const { page = 1, limit = 10 } = req.query;
-
+const Cards = async (req,res) =>{
+    const { page = 1, limit = 10 } = req.query;
+  
   try {
     const cards = await CardDetails.find()
       .skip((page - 1) * limit)
       .limit(Number(limit))
       .sort({ createdAt: -1 });
 
-    const total = await CardDetails.countDocuments();
+      console.log("cards.....",cards)
 
+    const total = await CardDetails.countDocuments();
+    
     res.status(200).json({
       total,
       page: Number(page),
@@ -64,29 +55,29 @@ const Cards = async (req, res) => {
 }
 
 const parseCardInfo = (text) => {
-  const lines = text.split('\n');
-  const cardInfo = {};
+    const lines = text.split('\n');
+    const cardInfo = {};
+  
+    lines.forEach(line => {
+      line = line.trim();
+      if (line.includes('@')) {
+        cardInfo.email = line;
+      } else if (/^\d{10}$/.test(line)) {
+        cardInfo.phoneNumber = line;
+      } else if (!cardInfo.name) {
+        cardInfo.name = line;
+      } else if (!cardInfo.jobTitle) {
+        cardInfo.jobTitle = line;
+      } else if (!cardInfo.companyName) {
+        cardInfo.companyName = line;
+      } else {
+        cardInfo.address = cardInfo.address ? `${cardInfo.address}, ${line}` : line;
+      }
+    });
+  
+    return cardInfo;
+  };
 
-  lines.forEach(line => {
-    line = line.trim();
-    if (line.includes('@')) {
-      cardInfo.email = line;
-    } else if (/^\d{10}$/.test(line)) {
-      cardInfo.phoneNumber = line;
-    } else if (!cardInfo.name) {
-      cardInfo.name = line;
-    } else if (!cardInfo.jobTitle) {
-      cardInfo.jobTitle = line;
-    } else if (!cardInfo.companyName) {
-      cardInfo.companyName = line;
-    } else {
-      cardInfo.address = cardInfo.address ? `${cardInfo.address}, ${line}` : line;
-    }
-  });
-
-  return cardInfo;
-};
-
-module.exports = {
-  Upload, Cards
+  module.exports = {
+    Upload, Cards
 };
