@@ -1,5 +1,6 @@
 const CardDetails = require('../model/cardDetails');
 const Tesseract = require('tesseract.js');
+const path = require('path');
 
 const Upload = async (req, res) => {
     try {
