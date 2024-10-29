@@ -4,10 +4,13 @@ const fs = require('fs');
 
 const Upload = async (req, res) => {
   try {
-    const fileBuffer = fs.readFileSync(req.file.path);
+    const fileBuffer = (req.file.path);
 
     const result = await tesseract.recognize(fileBuffer, 'eng', {
-      logger: info => console.log(info)
+      logger: info => console.log(info),
+      workerOptions: {
+        corePath: 'public/tesseract-core-simd.wasm'
+      }
     });
 
     const extractedText = result.data.text;
