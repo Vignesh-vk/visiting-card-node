@@ -9,7 +9,7 @@ const Upload = async (req, res) => {
     const result = await tesseract.recognize(fileBuffer, 'eng', {
       logger: info => console.log(info),
       workerOptions: {
-        corePath: './public/tesseract-core-simd.wasm'
+        corePath: 'public/tesseract-core-simd.wasm'
       }
     });
 
