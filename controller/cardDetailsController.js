@@ -4,13 +4,11 @@ const fs = require('fs');
 
 const Upload = async (req, res) => {
   try {
-    const fileBuffer = (req.file.path);
+    const fileBuffer = (req.file.buffer);
 
     const result = await tesseract.recognize(fileBuffer, 'eng', {
       logger: info => console.log(info),
-      workerOptions: {
-        corePath: 'public/tesseract-core-simd.wasm'
-      }
+      corePath: 'public/tesseract-core-simd.wasm'
     });
 
     const extractedText = result.data.text;
@@ -23,8 +21,9 @@ const Upload = async (req, res) => {
     await card.save();
 
     res.status(200).json(card);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (tesseractError) {
+    console.error('Tesseract error:', tesseractError);
+  return res.status(500).json({ message: 'Error processing the image.' });
   }
 }
 
