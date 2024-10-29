@@ -6,10 +6,8 @@ const {
 
 const router = express.Router();
 
-// const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
-
-
-var upload = multer({ dest: 'uploads/' });
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 router.post('/upload',upload.single('file'), Upload);
 router.get('/cards', Cards)
