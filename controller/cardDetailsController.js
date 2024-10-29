@@ -1,6 +1,7 @@
 const CardDetails = require('../model/cardDetails');
 const tesseract = require('tesseract.js');
-const fs = require('fs');
+const path = require('path');
+const corePath = path.join(__dirname, 'node_modules/tesseract.js-core/tesseract-core-simd.wasm');
 
 const Upload = async (req, res) => {
   try {
@@ -8,7 +9,7 @@ const Upload = async (req, res) => {
 
     const result = await tesseract.recognize(fileBuffer, 'eng', {
       logger: info => console.log(info),
-      corePath: 'public/tesseract-core-simd.wasm'
+      corePath: corePath
     });
 
     const extractedText = result.data.text;
