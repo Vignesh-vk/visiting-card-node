@@ -37,8 +37,6 @@ const Cards = async (req, res) => {
       .limit(Number(limit))
       .sort({ createdAt: -1 });
 
-    console.log("cards.....", cards)
-
     const total = await CardDetails.countDocuments();
 
     res.status(200).json({
