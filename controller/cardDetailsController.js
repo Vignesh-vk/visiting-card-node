@@ -1,11 +1,13 @@
 const CardDetails = require('../model/cardDetails');
-const tesseract = require('tesseract.js');
+// const tesseract = require('tesseract.js');
+const { createWorker } = require('tesseract.js');
 
 const Upload = async (req, res) => {
   try {
-    const result = await tesseract.recognize(req.file.buffer, 'eng', {
-      logger: info => console.log(info)
-    });
+    const worker = await createWorker('eng');
+  const result = await worker.recognize(req.file.buffer);
+  console.log(result.data.text);
+  await worker.terminate();
 
     const extractedText = result.data.text;
     const cardInfo = parseCardInfo(extractedText);
