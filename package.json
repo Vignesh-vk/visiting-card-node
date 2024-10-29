@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "copy-wasm": "copy node_modules\\tesseract.js-core\\tesseract-core-simd.wasm public\\"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +20,7 @@
     "tesseract.js-core": "^5.1.1"
   },
   "devDependencies": {
+    "copy-webpack-plugin": "^12.0.2",
     "copyfiles": "^2.4.1"
   }
 }
