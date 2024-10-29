@@ -1,13 +1,15 @@
 const CardDetails = require('../model/cardDetails');
-// const tesseract = require('tesseract.js');
-const { createWorker } = require('tesseract.js');
+const tesseract = require('tesseract.js');
+const fs = require('fs');
 
 const Upload = async (req, res) => {
   try {
-    const worker = await createWorker('eng');
-  const result = await worker.recognize('https://tesseract.projectnaptha.com/img/eng_bw.png');
-  console.log(result.data.text);
-  await worker.terminate();
+    console.log("req.....",req.file)
+    const fileBuffer = fs.readFileSync(req.file.path);
+
+    const result = await tesseract.recognize(fileBuffer, 'eng', {
+      logger: info => console.log(info)
+    });
 
     const extractedText = result.data.text;
     const cardInfo = parseCardInfo(extractedText);
